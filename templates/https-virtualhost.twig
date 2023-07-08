@@ -1,0 +1,13 @@
+ServerAdmin {{ host.admin }}
+Servername {{ domain }}
+
+{% include('base-virtualhost.twig') %}
+
+RewriteEngine On
+RewriteCond %{HTTP_HOST} !^{{ host.domain }}$ [NC]
+RewriteRule (.*) https://{{ host.domain }}$1 [R,L]
+
+SSLEngine On
+SSLCertificateFile    /etc/letsencrypt/live/{{ domain }}/cert.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/{{ domain }}/privkey.pem
+SSLCertificateChainFile    /etc/letsencrypt/live/{{ domain }}/chain.pem
