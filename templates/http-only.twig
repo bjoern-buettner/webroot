@@ -5,14 +5,6 @@
         RewriteCond %{HTTPS} !=on
         RewriteRule (.*) https://{{ host.vhost }}$1 [R,L]
     </VirtualHost>
-    <VirtualHost *:443>
-        {% include 'config-based-virtual-host.twig' %}
-
-        SSLEngine On
-        SSLCertificateFile    /etc/letsencrypt/live/{{ host.domain }}/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/{{ host.domain }}/privkey.pem
-        SSLCertificateChainFile    /etc/letsencrypt/live/{{ host.domain }}/chain.pem
-    </VirtualHost>
 {% endfor %}
 {% for host in defaulthosts %}
     <VirtualHost *:80>
@@ -21,17 +13,5 @@
         SSLEngine Off
         RewriteEngine On
         RewriteRule (.*) https://{{ host.domain }}$1 [R,L]
-    </VirtualHost>
-    <VirtualHost *:443>
-        {% include 'config-based-virtual-host.twig' %}
-
-        SSLEngine On
-        RewriteEngine On
-        RewriteCond %{HTTP_HOST} !^{{ host.domain }}$ [NC]
-        RewriteRule (.*) https://{{ host.domain }}$1 [R,L]
-        SSLEngine On
-        SSLCertificateFile    /etc/letsencrypt/live/{{ host.domain }}/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/{{ host.domain }}/privkey.pem
-        SSLCertificateChainFile    /etc/letsencrypt/live/{{ host.domain }}/chain.pem
     </VirtualHost>
 {% endfor %}
