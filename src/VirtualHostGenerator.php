@@ -127,7 +127,10 @@ class VirtualHostGenerator
     }
     public function create()
     {
-        exec("service apache2 stop");
+        exec("a2ensite https-only");
+        exec("a2dissite http-only");
+        file_put_contents('/etc/apache2/ports.conf', "Listen 443\n");
+        exec("service apache2 restart");
         sleep(60);
         $hostname = gethostname();
         $ip = gethostbyname($hostname);
@@ -148,12 +151,22 @@ WHERE server.hostname=:hostname');
         $stmt->execute([':hostname' => $hostname]);
         $this->buildServerHost($hostname, $stmt->fetchColumn(), $virtualhosts, $ip);
         file_put_contents(
-            '/etc/apache2/sites-enabled/all.conf',
-            $this->twig->render('config.twig', [
+            '/etc/apache2/sites-available/http-only.conf',
+            $this->twig->render('http-only.twig', [
                 'virtualhosts' => $virtualhosts,
                 'defaulthosts' => $defaulthosts,
             ])
         );
-        exec("service apache2 start");
+        file_put_contents(
+            '/etc/apache2/sites-available/https-only.conf',
+            $this->twig->render('https-only.twig', [
+                'virtualhosts' => $virtualhosts,
+                'defaulthosts' => $defaulthosts,
+            ])
+        );
+        exec("a2dissite https-only");
+        exec("a2ensite http-only");
+        file_put_contents('/etc/apache2/ports.conf', "Listen 80\nListen 443\n");
+        exec("service apache2 restart");
     }
 }

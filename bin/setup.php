@@ -4,16 +4,21 @@ echo "Welcome to idrinth/webroot. Answer a few quick questions to have your syst
 echo "\nWhat is your mysql hostname?";
 $hostname = trim(fgets(STDIN));
 echo "\nWhat is your mysql username?";
-$husername = trim(fgets(STDIN));
+$username = trim(fgets(STDIN));
 echo "\nWhat is your mysql password?";
 $password = trim(fgets(STDIN));
 echo "\nWhat is your mysql database name?";
 $database = trim(fgets(STDIN));
-file_put_contents(dirname(__DIR__) . '.env', "DB_DATABASE=$database
-DB_USER=$user
+file_put_contents(dirname(__DIR__) . '/.env', "DB_DATABASE=$database
+DB_USER=$username
 DB_PASSWORD=$password
-DB_HOST=$host");
-$pdo = new PDO("mysql:dbname=$database;host=$host", $username, $password);
+DB_HOST=$hostname");
+$pdo = new PDO("mysql:dbname=$database;host=$hostname", $username, $password);
+$pdo->exec("CREATE TABLE `force_refresh` (
+	`server` VARCHAR(255) NOT NULL COLLATE 'ascii_bin'
+)
+COLLATE='ascii_bin'
+ENGINE=InnoDB;");
 $pdo->exec("CREATE TABLE `owner` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
