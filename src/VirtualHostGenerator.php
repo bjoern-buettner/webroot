@@ -127,7 +127,6 @@ class VirtualHostGenerator
     }
     public function create()
     {
-        exec("a2ensite https-only");
         exec("a2dissite http-only");
         file_put_contents('/etc/apache2/ports.conf', "Listen 443\n");
         exec("service apache2 restart");
@@ -164,8 +163,8 @@ WHERE server.hostname=:hostname');
                 'defaulthosts' => $defaulthosts,
             ])
         );
-        exec("a2dissite https-only");
         exec("a2ensite http-only");
+        exec("a2ensite https-only");
         file_put_contents('/etc/apache2/ports.conf', "Listen 80\nListen 443\n");
         exec("service apache2 restart");
     }
