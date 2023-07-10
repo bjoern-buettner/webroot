@@ -85,46 +85,6 @@ class VirtualHostGenerator
             }
         }
     }
-    private function buildDefaultHostList(PDOStatement $statement, array &$virtualhosts, string $ip): void
-    {
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $vhost = 'default.' . $row['domain'];
-            echo "Handling $vhost\n";
-            if (gethostbyname($row['domain'] . '.') !== $ip) {
-                continue;
-            }
-            if (gethostbyname($vhost . '.') !== $ip) {
-                continue;
-            }
-            if (!$this->certificate($vhost, $row['admin'])) {
-                continue;
-            }
-            $virtualhosts[] = [
-                'domain' => $vhost,
-                'aliases' => ['*.' . $row['domain']],
-                'webroot' => "/var/www/public",
-                'root' => "/var/www",
-                'admin' => $row['admin'],
-            ];
-        }
-    }
-    private function buildServerHost(string $hostname, string $admin, array &$virtualhosts, string $ip): void
-    {
-        echo "Handling $hostname\n";
-        if (gethostbyname($hostname . '.') !== $ip) {
-            return;
-        }
-        if (!$this->certificate($hostname, $admin)) {
-            return;
-        }
-        $virtualhosts[] = [
-            'domain' => $hostname,
-            'aliases' => ['*'],
-            'webroot' => "/var/www/public",
-            'root' => "/var/www",
-            'admin' => $admin,
-        ];
-    }
     public function create()
     {
         exec("service apache2 stop");
@@ -140,18 +100,10 @@ WHERE server.hostname=:hostname');
         $stmt->execute([':hostname' => $hostname]);
         $virtualhosts = [];
         $this->buildHostList($stmt, $virtualhosts, $ip);
-        $stmt = $this->database->prepare("SELECT domain.domain, domain.admin FROM domain");
-        $stmt->execute();
-        $defaulthosts = [];
-        $this->buildDefaultHostList($stmt, $defaulthosts, $ip);
-        $stmt = $this->database->prepare('SELECT admin FROM server WHERE hostname=:hostname');
-        $stmt->execute([':hostname' => $hostname]);
-        $this->buildServerHost($hostname, $stmt->fetchColumn(), $virtualhosts, $ip);
         file_put_contents(
             '/etc/apache2/sites-enabled/all.conf',
             $this->twig->render('config.twig', [
                 'virtualhosts' => $virtualhosts,
-                'defaulthosts' => $defaulthosts,
             ])
         );
         exec("service apache2 start");
