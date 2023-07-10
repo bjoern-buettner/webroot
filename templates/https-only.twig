@@ -1,24 +1,14 @@
 {% for host in virtualhosts %}
-    <VirtualHost *:443>
-        {% include 'config-based-virtual-host.twig' %}
-
-        SSLEngine On
-        SSLCertificateFile    /etc/letsencrypt/live/{{ host.domain }}/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/{{ host.domain }}/privkey.pem
-        SSLCertificateChainFile    /etc/letsencrypt/live/{{ host.domain }}/chain.pem
+    <VirtualHost *:80>
+        {% include 'http-virtualhost.twig' %}
     </VirtualHost>
-{% endfor %}
-{% for host in defaulthosts %}
     <VirtualHost *:443>
-        {% include 'config-based-virtual-host.twig' %}
-
-        SSLEngine On
-        RewriteEngine On
-        RewriteCond %{HTTP_HOST} !^{{ host.domain }}$ [NC]
-        RewriteRule (.*) https://{{ host.domain }}$1 [R,L]
-        SSLEngine On
-        SSLCertificateFile    /etc/letsencrypt/live/{{ host.domain }}/cert.pem
-        SSLCertificateKeyFile /etc/letsencrypt/live/{{ host.domain }}/privkey.pem
-        SSLCertificateChainFile    /etc/letsencrypt/live/{{ host.domain }}/chain.pem
+        {% set domain=host.domain %}
+        {% include 'https-virtualhost.twig' %}
     </VirtualHost>
+    {% for domain in host.aliases %}
+        <VirtualHost *:443>
+            {% include 'https-virtualhost.twig' %}
+        </VirtualHost>
+    {% endfor %}
 {% endfor %}

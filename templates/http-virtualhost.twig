@@ -1,0 +1,14 @@
+ServerAdmin {{ host.admin }}
+Servername {{ host.domain }}
+
+{% for alias in host.aliases %}
+
+ServerAlias {{ alias }}
+
+{% endfor %}
+
+{% include('base-virtualhost.twig') %}
+
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule (.*) https://{{ host.domain }}$1 [R,L]

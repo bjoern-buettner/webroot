@@ -1,21 +1,12 @@
-ServerAdmin {{ host.admin }}
-Servername {{ host.domain }}
-
-{% for alias in host.aliases %}
-
-ServerAlias {{ alias }}
-
-{% endfor %}
-
 DocumentRoot {{ host.webroot }}
 ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 ErrorLog /var/log/{{ host.domain }}-error.log
 LogLevel warn
 CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 <Directory />
-    Options +FollowSymLinks
-    AllowOverride None
-    Require all denied
+Options +FollowSymLinks
+AllowOverride None
+Require all denied
 </Directory>
 <Directory {{ host.root }}>
     Options +ExecCGI -Indexes +FollowSymLinks +MultiViews
@@ -23,9 +14,9 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     Require all granted
 </Directory>
 <Directory /usr/lib/cgi-bin>
-    AllowOverride None
-    Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
-    Require all granted
+AllowOverride None
+Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+Require all granted
 </Directory>
 <IfModule php7_module>
     php_value atatus.app_name "{{ host.domain }}"
@@ -39,6 +30,3 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 </IfModule>
 Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 Header set Content-Security-Policy upgrade-insecure-requests
-RewriteEngine On
-RewriteCond %{HTTP_HOST} !^{{ host.domain }}$ [NC]
-RewriteRule (.*) https://{{ host.domain }}$1 [R,L]
