@@ -1,4 +1,4 @@
-DocumentRoot {{ host.webroot }}
+DocumentRoot {{ host.webroot }}{% if host.extra_webroot %}/public{% endif %}
 ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 ErrorLog /var/log/{{ host.domain }}-error.log
 LogLevel warn
