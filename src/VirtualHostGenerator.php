@@ -73,7 +73,7 @@ class VirtualHostGenerator
                 'root' => "/var/$vhost",
                 'admin' => $row['admin'],
                 'aliases' => $aliases,
-                'atatus_license_key' => $row['atatus_license_key'],
+                'atatus_license_key' => $row['atatus_api_key'],
             ];
             if (!is_dir('/var/' . $vhost)) {
                 mkdir('/var/' . $vhost);
@@ -88,7 +88,7 @@ class VirtualHostGenerator
     public function create()
     {
         exec("a2dissite http-only");
-        file_put_contents('/etc/apache2/ports.conf', "Listen 443\n");
+        file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 80\n", '', file_get_contents('/etc/apache2/ports.conf')));
         exec("service apache2 restart");
         sleep(60);
         $hostname = gethostname();
@@ -112,12 +112,12 @@ WHERE server.hostname=:hostname');
             '/etc/apache2/sites-available/https-only.conf',
             $this->twig->render('https-only.twig', [
                 'virtualhosts' => $virtualhosts,
-                'defaulthosts' => $defaulthosts,
+                'defaulthosts' => [],
             ])
         );
         exec("a2ensite http-only");
         exec("a2ensite https-only");
-        file_put_contents('/etc/apache2/ports.conf', "Listen 80\nListen 443\n");
+        file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 443\n", "Listen 80\nListen 443\n", file_get_contents('/etc/apache2/ports.conf')));
         exec("service apache2 restart");
     }
 }
