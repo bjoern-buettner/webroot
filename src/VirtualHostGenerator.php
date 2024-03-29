@@ -69,7 +69,7 @@ class VirtualHostGenerator
             }
             $virtualhosts[] = [
                 'domain' => $vhost,
-                'webroot' => $row['extra_webroot'] === '1' ? "/var/$vhost/public" : "/var/$vhost",
+                'webroot' => $row['extra_webroot'] == '1' ? "/var/$vhost/public" : "/var/$vhost",
                 'root' => "/var/$vhost",
                 'admin' => $row['admin'],
                 'aliases' => $aliases,
