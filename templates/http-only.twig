@@ -1,6 +1,6 @@
 {% for host in virtualhosts %}
     <VirtualHost *:80>
-        {% include 'config-based-virtual-host.twig' %}
+        {% include 'http-virtualhost.twig' %}
 
         RewriteCond %{HTTPS} !=on
         RewriteRule (.*) https://{{ host.vhost }}$1 [R,L]
@@ -8,7 +8,7 @@
 {% endfor %}
 {% for host in defaulthosts %}
     <VirtualHost *:80>
-        {% include 'config-based-virtual-host.twig' %}
+        {% include 'http-virtualhost.twig' %}
 
         SSLEngine Off
         RewriteEngine On
