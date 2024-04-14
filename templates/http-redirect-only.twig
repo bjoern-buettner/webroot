@@ -1,0 +1,8 @@
+{% for host in virtualhosts %}
+    <VirtualHost *:80>
+        {% include 'http-redirect.twig' %}
+
+        RewriteEngine On
+        RewriteRule (.*) {{ host.target }} [R,L]
+    </VirtualHost>
+{% endfor %}

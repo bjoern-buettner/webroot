@@ -74,5 +74,20 @@ $pdo->exec("CREATE TABLE `virtualhost_domain_alias` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
+$pdo->exec("CREATE TABLE `virtualhost` (
+	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
+	`domain` INT(10) UNSIGNED NOT NULL,
+	`server` INT(10) UNSIGNED NOT NULL,
+	`target` TEXT NOT NULL COLLATE 'ascii_bin',
+	PRIMARY KEY (`aid`) USING BTREE,
+	UNIQUE INDEX `name_domain` (`name`, `domain`) USING BTREE,
+	INDEX `domain` (`domain`) USING BTREE,
+	INDEX `server` (`server`) USING BTREE,
+	CONSTRAINT `domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
+	CONSTRAINT `server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
+)
+COLLATE='ascii_bin'
+ENGINE=InnoDB;");
 $pdo->prepare("INSERT INTO server (hostname) VALUES (:hostname)")->execute(['hostname' => gethostname()]);
 echo "\nDatabase created and current hostname added to servers.\n";
