@@ -74,7 +74,7 @@ $pdo->exec("CREATE TABLE `virtualhost_domain_alias` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `virtualhost` (
+$pdo->exec("CREATE TABLE `links` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`domain` INT(10) UNSIGNED NOT NULL,
