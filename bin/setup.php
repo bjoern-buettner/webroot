@@ -84,8 +84,8 @@ $pdo->exec("CREATE TABLE `links` (
 	UNIQUE INDEX `name_domain` (`name`, `domain`) USING BTREE,
 	INDEX `domain` (`domain`) USING BTREE,
 	INDEX `server` (`server`) USING BTREE,
-	CONSTRAINT `domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
-	CONSTRAINT `server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
+	CONSTRAINT `links_domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
+	CONSTRAINT `links_server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
