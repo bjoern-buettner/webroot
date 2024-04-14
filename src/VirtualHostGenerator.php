@@ -143,7 +143,7 @@ WHERE server.hostname=:hostname');
 FROM link
 INNER JOIN server ON link.server=server.aid
 INNER JOIN domain ON domain.aid=link.domain
-WHERE link.hostname=:hostname');
+WHERE server.hostname=:hostname');
         $stmt->execute([':hostname' => $hostname]);
         $virtualhosts = [];
         $this->buildLinkList($stmt, $virtualhosts, $ip);
