@@ -74,7 +74,7 @@ $pdo->exec("CREATE TABLE `virtualhost_domain_alias` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `links` (
+$pdo->exec("CREATE TABLE `link` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`domain` INT(10) UNSIGNED NOT NULL,
@@ -84,8 +84,8 @@ $pdo->exec("CREATE TABLE `links` (
 	UNIQUE INDEX `name_domain` (`name`, `domain`) USING BTREE,
 	INDEX `domain` (`domain`) USING BTREE,
 	INDEX `server` (`server`) USING BTREE,
-	CONSTRAINT `links_domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
-	CONSTRAINT `links_server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
+	CONSTRAINT `link_domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
+	CONSTRAINT `link_server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
