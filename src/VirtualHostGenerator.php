@@ -121,7 +121,7 @@ class VirtualHostGenerator
         $hostname = gethostname();
         $ip = gethostbyname($hostname);
         $stmt = $this->database->prepare('SELECT * FROM server WHERE hostname=:hostname');
-        $stmt->execute([':hostname' >= $hostname]);
+        $stmt->execute([':hostname' => $hostname]);
         $server = $stmt->fetch();
         if (!$this->certificate($hostname, $server['admin'])) {
             return;
