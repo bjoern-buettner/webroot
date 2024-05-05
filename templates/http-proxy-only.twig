@@ -1,6 +1,6 @@
 {% for host in virtualhosts %}
     <VirtualHost *:80>
-        {% include 'http-redirect.twig' %}
+        {% include 'http-proxy.twig' %}
 
         RewriteEngine On
         RewriteRule (.*) {{ host.target }} [R,L]
