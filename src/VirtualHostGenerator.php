@@ -190,13 +190,13 @@ WHERE server.hostname=:hostname');
         $this->buildLinkList($stmt, $virtualhosts, $ip);
         file_put_contents(
             '/etc/apache2/sites-available/http-proxy-only.conf',
-            $this->twig->render('http-redirect-only.twig', [
+            $this->twig->render('http-proxy-only.twig', [
                 'virtualhosts' => $virtualhosts,
             ])
         );
         file_put_contents(
             '/etc/apache2/sites-available/https-proxy-only.conf',
-            $this->twig->render('https-redirect-only.twig', [
+            $this->twig->render('https-proxy-only.twig', [
                 'virtualhosts' => $virtualhosts
             ])
         );
