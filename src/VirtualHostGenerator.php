@@ -123,6 +123,9 @@ class VirtualHostGenerator
         $stmt = $this->database->prepare('SELECT * FROM server WHERE hostname=:hostname');
         $stmt->execute(['hostname' >= $hostname]);
         $server = $stmt->fetch();
+        if (!$this->certificate($hostname, $server['admin'])) {
+            return;
+        }
         file_put_contents(
             '/etc/apache2/sites-available/default.conf',
             $this->twig->render('default.twig', [
