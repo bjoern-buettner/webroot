@@ -1,0 +1,11 @@
+{% for host in virtualhosts %}
+    <VirtualHost *:443>
+        {% set domain=host.domain %}
+        {% include 'https-redirect.twig' %}
+    </VirtualHost>
+    {% for domain in host.aliases %}
+        <VirtualHost *:443>
+            {% include 'https-redirect.twig' %}
+        </VirtualHost>
+    {% endfor %}
+{% endfor %}

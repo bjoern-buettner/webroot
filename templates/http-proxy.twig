@@ -1,0 +1,12 @@
+ServerAdmin {{ host.admin }}
+Servername {{ host.domain }}
+
+{% for alias in host.aliases %}
+
+ServerAlias {{ alias }}
+
+{% endfor %}
+
+Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+Header set Content-Security-Policy upgrade-insecure-requests
+

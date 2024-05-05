@@ -14,12 +14,12 @@ DB_USER=$username
 DB_PASSWORD=$password
 DB_HOST=$hostname");
 $pdo = new PDO("mysql:dbname=$database;host=$hostname", $username, $password);
-$pdo->exec("CREATE TABLE `force_refresh` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `force_refresh` (
 	`server` VARCHAR(255) NOT NULL COLLATE 'ascii_bin'
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `owner` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `owner` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`atatus_license_key` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
@@ -27,7 +27,7 @@ $pdo->exec("CREATE TABLE `owner` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `domain` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `domain` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`domain` VARCHAR(255) NULL DEFAULT NULL COLLATE 'ascii_bin',
 	`admin` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
@@ -38,7 +38,7 @@ $pdo->exec("CREATE TABLE `domain` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `server` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `server` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`hostname` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`admin` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
@@ -47,7 +47,7 @@ $pdo->exec("CREATE TABLE `server` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `virtualhost` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `virtualhost` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`hidden` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
 	`extra_webroot` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
@@ -63,7 +63,7 @@ $pdo->exec("CREATE TABLE `virtualhost` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `virtualhost_domain_alias` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `virtualhost_domain_alias` (
 	`virtualhost` INT(10) UNSIGNED NOT NULL,
 	`domain` INT(10) UNSIGNED NOT NULL,
 	`subdomain` VARCHAR(255) NOT NULL DEFAULT '' COLLATE 'ascii_bin',
@@ -74,7 +74,7 @@ $pdo->exec("CREATE TABLE `virtualhost_domain_alias` (
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");
-$pdo->exec("CREATE TABLE `link` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `link` (
 	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`domain` INT(10) UNSIGNED NOT NULL,
@@ -86,6 +86,21 @@ $pdo->exec("CREATE TABLE `link` (
 	INDEX `server` (`server`) USING BTREE,
 	CONSTRAINT `link_domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
 	CONSTRAINT `link_server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
+)
+COLLATE='ascii_bin'
+ENGINE=InnoDB;");
+$pdo->exec("CREATE TABLE IF NOT EXISTS `proxy` (
+	`aid` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
+	`domain` INT(10) UNSIGNED NOT NULL,
+	`server` INT(10) UNSIGNED NOT NULL,
+	`target` TEXT NOT NULL COLLATE 'ascii_bin',
+	PRIMARY KEY (`aid`) USING BTREE,
+	UNIQUE INDEX `name_domain` (`name`, `domain`) USING BTREE,
+	INDEX `domain` (`domain`) USING BTREE,
+	INDEX `server` (`server`) USING BTREE,
+	CONSTRAINT `proxy_domain` FOREIGN KEY (`domain`) REFERENCES `virtualhosts`.`domain` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE,
+	CONSTRAINT `proxy_server` FOREIGN KEY (`server`) REFERENCES `virtualhosts`.`server` (`aid`) ON UPDATE NO ACTION ON DELETE CASCADE
 )
 COLLATE='ascii_bin'
 ENGINE=InnoDB;");

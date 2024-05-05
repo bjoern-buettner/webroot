@@ -111,13 +111,31 @@ class VirtualHostGenerator
     }
     public function create()
     {
+        exec("a2dissite default");
         exec("a2dissite http-only");
         exec("a2dissite http-redirect-only");
+        exec("a2dissite http-proxy-only");
         file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 80\n", '', file_get_contents('/etc/apache2/ports.conf')));
         exec("service apache2 restart");
         sleep(60);
         $hostname = gethostname();
         $ip = gethostbyname($hostname);
+        $stmt = $this->database->prepare('SELECT * FROM server WHERE hostname=:hostname');
+        $stmt->execute(['hostname' >= $hostname]);
+        $server = $stmt->fetch();
+        file_put_contents(
+            '/etc/apache2/sites-available/default.conf',
+            $this->twig->render('default.twig', [
+                'host' => [
+                    'domain' => $hostname,
+                    'webroot' => "/var/www/public",
+                    'root' => "/var/www",
+                    'admin' => $server['admin'],
+                    'aliases' => [],
+                    'atatus_license_key' => $server['atatus_license_key'],
+                ],
+            ])
+        );
         $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.extra_webroot,domain.domain, domain.admin,owner.atatus_api_key
 FROM virtualhost
 INNER JOIN server ON server.aid=virtualhost.server
@@ -159,10 +177,33 @@ WHERE server.hostname=:hostname');
                 'virtualhosts' => $virtualhosts
             ])
         );
+        $stmt = $this->database->prepare('SELECT proxy.name,domain.domain,proxy.target,domain.admin
+FROM proxy
+INNER JOIN server ON proxy.server=server.aid
+INNER JOIN domain ON domain.aid=proxy.domain
+WHERE server.hostname=:hostname');
+        $stmt->execute([':hostname' => $hostname]);
+        $virtualhosts = [];
+        $this->buildLinkList($stmt, $virtualhosts, $ip);
+        file_put_contents(
+            '/etc/apache2/sites-available/http-proxy-only.conf',
+            $this->twig->render('http-redirect-only.twig', [
+                'virtualhosts' => $virtualhosts,
+            ])
+        );
+        file_put_contents(
+            '/etc/apache2/sites-available/https-proxy-only.conf',
+            $this->twig->render('https-redirect-only.twig', [
+                'virtualhosts' => $virtualhosts
+            ])
+        );
+        exec("a2ensite default");
         exec("a2ensite http-only");
         exec("a2ensite https-only");
         exec("a2ensite http-redirect-only");
         exec("a2ensite https-redirect-only");
+        exec("a2ensite http-proxy-only");
+        exec("a2ensite https-proxy-only");
         file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 443\n", "Listen 80\nListen 443\n", file_get_contents('/etc/apache2/ports.conf')));
         exec("service apache2 restart");
     }
