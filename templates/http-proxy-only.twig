@@ -3,6 +3,6 @@
         {% include 'http-proxy.twig' %}
 
         RewriteEngine On
-        RewriteRule (.*) {{ host.target }} [R,L]
+        RewriteRule (.*) https://{{ host.vhost }}$1 [R,L]
     </VirtualHost>
 {% endfor %}
