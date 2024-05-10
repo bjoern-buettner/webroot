@@ -5,8 +5,8 @@ Servername {{ domain }}
 Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 Header set Content-Security-Policy upgrade-insecure-requests
 
-ProxyPass / http://{{ host.target }}
-ProxyPassReverse / http://{{ host.target }}
+ProxyPass / http://{{ host.target }}/
+ProxyPassReverse / http://{{ host.target }}/
 
 SSLEngine On
 SSLCertificateFile    /etc/letsencrypt/live/{{ domain }}/cert.pem
