@@ -40,7 +40,7 @@ class VirtualHostGenerator
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $vhost = trim($row['name'] . '.' . $row['domain'], '.');
             echo "Handling $vhost\n";
-            if (gethostbyname($vhost . '.') !== $ip) {
+            if ($row['is_proxied'] == 1 || gethostbyname($vhost . '.') !== $ip) {
                 continue;
             }
             if (!$this->certificate($vhost, $row['admin'])) {
@@ -48,7 +48,7 @@ class VirtualHostGenerator
             }
             $aliases = [];
             echo "  Handling Alias www.$vhost\n";
-            if (gethostbyname("www.$vhost.") === $ip && $this->certificate("www.$vhost", $row['admin'])) {
+            if (($row['is_proxied'] == 1 || gethostbyname("www.$vhost.")) === $ip && $this->certificate("www.$vhost", $row['admin'])) {
                 $aliases[] = "www.$vhost";
             }
             $stmt = $this->database->prepare('SELECT virtualhost_domain_alias.subdomain,domain.domain,domain.admin '
@@ -139,7 +139,7 @@ class VirtualHostGenerator
                 ],
             ])
         );
-        $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.extra_webroot,domain.domain, domain.admin,owner.atatus_api_key
+        $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.extra_webroot,domain.domain,domain.is_proxied,domain.admin,owner.atatus_api_key
 FROM virtualhost
 INNER JOIN server ON server.aid=virtualhost.server
 INNER JOIN domain ON domain.aid=virtualhost.domain
