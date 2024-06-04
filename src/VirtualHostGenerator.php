@@ -40,7 +40,7 @@ class VirtualHostGenerator
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $vhost = trim($row['name'] . '.' . $row['domain'], '.');
             echo "Handling $vhost\n";
-            if ($row['is_proxied'] == 0 || gethostbyname($vhost . '.') !== $ip) {
+            if ($row['is_proxied'] == 0 && gethostbyname($vhost . '.') !== $ip) {
                 continue;
             }
             if (!$this->certificate($vhost, $row['admin'])) {
