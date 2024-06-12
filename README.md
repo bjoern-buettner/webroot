@@ -1,6 +1,6 @@
 # idrinth/webroot
 
-This small package helps managing certificates for an apache2 automatically. It also provides a reasonable catch all page for visitors who misstyped a project. It's for my personal use, but feel free to use or improve it.
+This small package helps managing certificates for an apache2 automatically. It also provides a reasonable catch-all page for visitors who mistyped a project. It's for my personal use, but feel free to use or improve it.
 
 ## Deployment
 

@@ -12,7 +12,8 @@ $database = trim(fgets(STDIN));
 file_put_contents(dirname(__DIR__) . '/.env', "DB_DATABASE=$database
 DB_USER=$username
 DB_PASSWORD=$password
-DB_HOST=$hostname");
+DB_HOST=$hostname
+ROTATE_LOG_DAYS=7");
 $pdo = new PDO("mysql:dbname=$database;host=$hostname", $username, $password);
 $pdo->exec("CREATE TABLE IF NOT EXISTS `force_refresh` (
 	`server` VARCHAR(255) NOT NULL COLLATE 'ascii_bin'

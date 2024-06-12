@@ -10,10 +10,13 @@ class VirtualHostGenerator
 {
     private PDO $database;
     private Environment $twig;
-    public function __construct(PDO $database, Environment $twig)
+    private int $rotateLogDays;
+
+    public function __construct(PDO $database, Environment $twig, int $rotateLogDays)
     {
         $this->database = $database;
         $this->twig = $twig;
+        $this->rotateLogDays = $rotateLogDays;
     }
     private function certificate(string $vhost, string $admin): bool
     {
@@ -82,6 +85,20 @@ class VirtualHostGenerator
             if ($row['extra_webroot'] === '1' && !is_dir('/var/' . $vhost . '/public')) {
                 mkdir('/var/' . $vhost . '/public');
                 chown('/var/' . $vhost . '/public', 'www-data');
+            }
+            $today = date('Ymd');
+            if (! is_file("/var/log/$vhost-access.$today.log")) {
+                rename("/var/log/$vhost-access.log", "/var/log/$vhost-access.$today.log");
+            }
+            if (! is_file("/var/log/$vhost-error.$today.log")) {
+                rename("/var/log/$vhost-error.log", "/var/log/$vhost-error.$today.log");
+            }
+            $tooOld = date('Ymd', strtotime("now -{$this->rotateLogDays}days"));
+            if (is_file("/var/log/$vhost-access.$tooOld.log")) {
+                unlink("/var/log/$vhost-access.$tooOld.log");
+            }
+            if (is_file("/var/log/$vhost-error.$tooOld.log")) {
+                unlink("/var/log/$vhost-error.$tooOld.log");
             }
         }
     }
