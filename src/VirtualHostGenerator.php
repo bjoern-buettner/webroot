@@ -40,7 +40,7 @@ class VirtualHostGenerator
     }
     private function buildHostList(PDOStatement $statement, array &$virtualhosts, string $ip): void
     {
-        $hasCoreRuleset = is_dir('/etc/coreruleset'); // https://github.com/coreruleset/coreruleset
+        $hasCoreRuleset = is_dir('/opt/coreruleset'); // https://github.com/coreruleset/coreruleset
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $vhost = trim($row['name'] . '.' . $row['domain'], '.');
             echo "Handling $vhost\n";
@@ -167,7 +167,7 @@ class VirtualHostGenerator
                     'aliases' => [],
                     'atatus_license_key' => $server['atatus_license_key'],
                     'user' => 'www-data',
-                    'hasCoreRuleset' => is_dir('/etc/coreruleset'), // https://github.com/coreruleset/coreruleset
+                    'hasCoreRuleset' => is_dir('/opt/coreruleset'), // https://github.com/coreruleset/coreruleset
                 ],
             ])
         );

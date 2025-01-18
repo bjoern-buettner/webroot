@@ -43,11 +43,11 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 
     {% if host.hasCoreRuleSet %}
 
-        IncludeOptional /etc/coreruleset/crs-setup.conf
-        IncludeOptional /etc/coreruleset/plugins/*-config.conf
-        IncludeOptional /etc/coreruleset/plugins/*-before.conf
-        IncludeOptional /etc/coreruleset/rules/*.conf
-        IncludeOptional /etc/coreruleset/plugins/*-after.conf
+        IncludeOptional /opt/coreruleset/crs-setup.conf
+        IncludeOptional /opt/coreruleset/plugins/*-config.conf
+        IncludeOptional /opt/coreruleset/plugins/*-before.conf
+        IncludeOptional /opt/coreruleset/rules/*.conf
+        IncludeOptional /opt/coreruleset/plugins/*-after.conf
 
     {% endif %}
 
