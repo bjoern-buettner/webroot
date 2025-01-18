@@ -31,7 +31,7 @@ Require all granted
 
 </IfModule>
 <IfModule mpm_itk_module>
-    AssignUserId {{ host.user }} {{ host.user }}
+    AssignUserId "{{ host.user }}" "{{ host.user }}"
 </IfModule>
 Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 Header set Content-Security-Policy upgrade-insecure-requests
