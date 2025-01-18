@@ -162,6 +162,7 @@ class VirtualHostGenerator
                     'admin' => $server['admin'],
                     'aliases' => [],
                     'atatus_license_key' => $server['atatus_license_key'],
+                    'user' => 'www-data',
                 ],
             ])
         );
