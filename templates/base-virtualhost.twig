@@ -40,6 +40,17 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     SecResponseBodyAccess On
     SecResponseBodyMimeType text/plain text/html text/xml application/json
     SecDefaultAction "phase:2,deny,log,status:403"
+
+    {% if host.hasCoreRuleSet %}
+
+        IncludeOptional /etc/coreruleset/crs-setup.conf
+        IncludeOptional /etc/coreruleset/plugins/*-config.conf
+        IncludeOptional /etc/coreruleset/plugins/*-before.conf
+        IncludeOptional /etc/coreruleset/rules/*.conf
+        IncludeOptional /etc/coreruleset/plugins/*-after.conf
+
+    {% endif %}
+
 </IfModule>
 <IfModule mod_evasive20.c>
     DOSHashTableSize 3097
