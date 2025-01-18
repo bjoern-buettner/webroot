@@ -70,7 +70,7 @@ class VirtualHostGenerator
                     $aliases[] = "www.$domain";
                 }
             }
-            $user = 'web_user_'.md5($vhost);
+            $user = 'webuser'.md5($vhost);
             $virtualhosts[] = [
                 'domain' => $vhost,
                 'webroot' => $row['extra_webroot'] == '1' ? "/var/$vhost/public" : "/var/$vhost",
