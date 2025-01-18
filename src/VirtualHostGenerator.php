@@ -70,6 +70,7 @@ class VirtualHostGenerator
                     $aliases[] = "www.$domain";
                 }
             }
+            $user = 'web_user_'.md5($vhost);
             $virtualhosts[] = [
                 'domain' => $vhost,
                 'webroot' => $row['extra_webroot'] == '1' ? "/var/$vhost/public" : "/var/$vhost",
@@ -77,15 +78,23 @@ class VirtualHostGenerator
                 'admin' => $row['admin'],
                 'aliases' => $aliases,
                 'atatus_license_key' => $row['atatus_api_key'],
+                'user' => $user,
             ];
             if (!is_dir('/var/' . $vhost)) {
                 mkdir('/var/' . $vhost);
-                chown('/var/' . $vhost, 'www-data');
             }
             if ($row['extra_webroot'] === '1' && !is_dir('/var/' . $vhost . '/public')) {
                 mkdir('/var/' . $vhost . '/public');
-                chown('/var/' . $vhost . '/public', 'www-data');
             }
+            shell_exec("useradd -c \"$vhost\" $user || true");
+            if ($items = glob('/var/' . $vhost . "/*")) {
+                foreach ($items as $item) {
+                    chown($item, $user);
+                    chgrp($item, $user);
+                }
+            }
+            chown('/var/' . $vhost, $user);
+            chgrp('/var/' . $vhost, $user);
             $today = date('Ymd');
             if (! is_file("/var/log/$vhost-access.$today.log")) {
                 rename("/var/log/$vhost-access.log", "/var/log/$vhost-access.$today.log");

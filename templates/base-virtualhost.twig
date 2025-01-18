@@ -30,5 +30,8 @@ Require all granted
     {% if host.atatus_license_key %}php_value atatus.license_key "{{ host.atatus_license_key }}"{% endif %}
 
 </IfModule>
+<IfModule mpm_itk_module>
+    AssignUserId {{ host.user }} {{ host.user }}
+</IfModule>
 Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 Header set Content-Security-Policy upgrade-insecure-requests
