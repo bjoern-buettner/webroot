@@ -4,27 +4,28 @@ ErrorLog /var/log/{{ host.domain }}-error.log
 LogLevel warn
 CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 <Directory />
-Options +FollowSymLinks
-AllowOverride None
-Require all denied
+    Options +FollowSymLinks
+    AllowOverride None
+    Require all denied
 </Directory>
 <Directory {{ host.root }}>
-    Options +ExecCGI -Indexes +FollowSymLinks +MultiViews
+    Options +ExecCGI -Indexes +FollowSymLinks -MultiViews
     AllowOverride All
     Require all granted
 </Directory>
 <Directory /usr/lib/cgi-bin>
-AllowOverride None
-Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
-Require all granted
+    AllowOverride None
+    Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+    Require all granted
 </Directory>
-<IfModule php7_module>
-    php_value atatus.app_name "{{ host.domain }}"
-
-    {% if host.atatus_license_key %}php_value atatus.license_key "{{ host.atatus_license_key }}"{% endif %}
-
-</IfModule>
 <IfModule php_module>
+    php_flag log_errors On
+    php_flag display_errors Off
+    php_flag session.cookie_httponly On
+    php_flag session.cookie_secure On
+    php_flag session.use_strict_mode On
+    php_value open_basedir {{ host.root }}
+    php_value error_log /var/log/{{ host.domain }}-php.log
     php_value atatus.app_name "{{ host.domain }}"
 
     {% if host.atatus_license_key %}php_value atatus.license_key "{{ host.atatus_license_key }}"{% endif %}
@@ -33,14 +34,39 @@ Require all granted
 <IfModule mpm_itk_module>
     AssignUserId "{{ host.user }}" "{{ host.user }}"
 </IfModule>
+<IfModule security2_module>
+    SecRuleEngine On
+    SecRequestBodyAccess On
+    SecResponseBodyAccess On
+    SecResponseBodyMimeType text/plain text/html text/xml application/json
+    SecDefaultAction "phase:2,deny,log,status:403"
+</IfModule>
 <IfModule mod_evasive20.c>
     DOSHashTableSize 3097
     DOSPageCount 10
-    DOSSiteCount 100
+    DOSSiteCount 65
     DOSPageInterval 1
     DOSSiteInterval 2
-    DOSBlockingPeriod 15
+    DOSBlockingPeriod 75
     DOSLogDir "/var/log/{{ host.domain }}-evasive.log"
 </IfModule>
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml application/json
+</IfModule>
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+</IfModule>
+<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|git|svn|yml|yaml|lock|json)$">
+    Require all denied
+</FilesMatch>
+Header set X-Content-Type-Options "nosniff"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set X-XSS-Protection "1; mode=block"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
 Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 Header set Content-Security-Policy upgrade-insecure-requests

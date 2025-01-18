@@ -89,33 +89,29 @@ class VirtualHostGenerator
             shell_exec("useradd -c \"$vhost\" $user || true");
             if ($items = glob('/var/' . $vhost . "/*")) {
                 foreach ($items as $item) {
-                    chown($item, $user);
-                    chgrp($item, $user);
+                    $this->chowngrp($item, $user);
                 }
             }
-            chown('/var/' . $vhost, $user);
-            chgrp('/var/' . $vhost, $user);
+            $this->chowngrp('/var/' . $vhost, $user);
             $today = date('Ymd');
-            if (! is_file("/var/log/$vhost-access.$today.log")) {
-                rename("/var/log/$vhost-access.log", "/var/log/$vhost-access.$today.log");
-            }
-            if (! is_file("/var/log/$vhost-error.$today.log")) {
-                rename("/var/log/$vhost-error.log", "/var/log/$vhost-error.$today.log");
-            }
-            if (! is_file("/var/log/$vhost-evasive.$today.log")) {
-                rename("/var/log/$vhost-evasive.log", "/var/log/$vhost-evasive.$today.log");
-            }
             $tooOld = date('Ymd', strtotime("now -{$this->rotateLogDays}days"));
-            if (is_file("/var/log/$vhost-access.$tooOld.log")) {
-                unlink("/var/log/$vhost-access.$tooOld.log");
-            }
-            if (is_file("/var/log/$vhost-error.$tooOld.log")) {
-                unlink("/var/log/$vhost-error.$tooOld.log");
-            }
-            if (is_file("/var/log/$vhost-evasive.$tooOld.log")) {
-                unlink("/var/log/$vhost-evasive.$tooOld.log");
+            foreach (['access', 'error', 'php', 'evasive'] as $type) {
+                if (! is_file("/var/log/$vhost-$type.$today.log")) {
+                    rename(
+                        "/var/log/$vhost-$type.log",
+                        "/var/log/$vhost-$type.$today.log"
+                    );
+                }
+                if (is_file("/var/log/$vhost-$type.$tooOld.log")) {
+                    unlink("/var/log/$vhost-$type.$tooOld.log");
+                }
             }
         }
+    }
+    private function chowngrp(string $path, string $owner): void
+    {
+        chown($path, $owner);
+        chgrp($path, $owner);
     }
     private function buildLinkList(PDOStatement $statement, array &$virtualhosts, string $ip): void
     {
