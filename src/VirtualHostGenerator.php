@@ -102,12 +102,18 @@ class VirtualHostGenerator
             if (! is_file("/var/log/$vhost-error.$today.log")) {
                 rename("/var/log/$vhost-error.log", "/var/log/$vhost-error.$today.log");
             }
+            if (! is_file("/var/log/$vhost-evasive.$today.log")) {
+                rename("/var/log/$vhost-evasive.log", "/var/log/$vhost-evasive.$today.log");
+            }
             $tooOld = date('Ymd', strtotime("now -{$this->rotateLogDays}days"));
             if (is_file("/var/log/$vhost-access.$tooOld.log")) {
                 unlink("/var/log/$vhost-access.$tooOld.log");
             }
             if (is_file("/var/log/$vhost-error.$tooOld.log")) {
                 unlink("/var/log/$vhost-error.$tooOld.log");
+            }
+            if (is_file("/var/log/$vhost-evasive.$tooOld.log")) {
+                unlink("/var/log/$vhost-evasive.$tooOld.log");
             }
         }
     }
