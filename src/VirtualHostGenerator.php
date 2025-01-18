@@ -70,7 +70,7 @@ class VirtualHostGenerator
                     $aliases[] = "www.$domain";
                 }
             }
-            $user = 'webuser'.md5($vhost);
+            $user = md5($vhost);
             $virtualhosts[] = [
                 'domain' => $vhost,
                 'webroot' => $row['extra_webroot'] == '1' ? "/var/$vhost/public" : "/var/$vhost",
@@ -86,7 +86,7 @@ class VirtualHostGenerator
             if ($row['extra_webroot'] === '1' && !is_dir('/var/' . $vhost . '/public')) {
                 mkdir('/var/' . $vhost . '/public');
             }
-            shell_exec("useradd -c \"$vhost\" $user || true");
+            shell_exec("useradd --badusername -c \"$vhost\" $user || true");
             if ($items = glob('/var/' . $vhost . "/*")) {
                 foreach ($items as $item) {
                     chown($item, $user);
