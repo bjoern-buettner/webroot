@@ -8,15 +8,34 @@ use Twig\Environment;
 
 class VirtualHostGenerator
 {
-    private PDO $database;
-    private Environment $twig;
-    private int $rotateLogDays;
+    private const array REQUIRED_APACHE2_MODULES = [
+        'ssl',
+        'rewrite',
+        'proxy',
+    ];
+    private const array SUGGESTED_APACHE2_MODULES = [
+        'expires',
+        'deflate',
+        'evasive20',
+        'security2',
+        'mpm_itk',
+        'php',
+        'headers',
+    ];
+    private const array HTTP_SITES = [
+        'default',
+        'http-only',
+        'http-redirect-only',
+        'http-proxy-only',
+    ];
+    private const array HTTPS_SITES = [
+        'https-only',
+        'https-redirect-only',
+        'a2ensite https-proxy-only',
+    ];
 
-    public function __construct(PDO $database, Environment $twig, int $rotateLogDays)
+    public function __construct(private PDO $database, private Environment $twig, private int $rotateLogDays, private bool $enableSuggested)
     {
-        $this->database = $database;
-        $this->twig = $twig;
-        $this->rotateLogDays = $rotateLogDays;
     }
     private function certificate(string $vhost, string $admin): bool
     {
@@ -139,22 +158,13 @@ class VirtualHostGenerator
             ];
         }
     }
-    public function create()
+    private function handleDefault(string $hostname): bool
     {
-        exec("a2dissite default");
-        exec("a2dissite http-only");
-        exec("a2dissite http-redirect-only");
-        exec("a2dissite http-proxy-only");
-        file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 80\n", '', file_get_contents('/etc/apache2/ports.conf')));
-        exec("service apache2 restart");
-        sleep(60);
-        $hostname = gethostname();
-        $ip = gethostbyname($hostname);
         $stmt = $this->database->prepare('SELECT * FROM server WHERE hostname=:hostname');
         $stmt->execute([':hostname' => $hostname]);
         $server = $stmt->fetch();
         if (!$this->certificate($hostname, $server['admin'])) {
-            return;
+            return false;
         }
         file_put_contents(
             '/etc/apache2/sites-available/default.conf',
@@ -171,6 +181,10 @@ class VirtualHostGenerator
                 ],
             ])
         );
+        return true;
+    }
+    private function handleVirtualHosts(string $hostname, string $ip): void
+    {
         $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.extra_webroot,domain.domain,domain.is_proxied,domain.admin,owner.atatus_api_key
 FROM virtualhost
 INNER JOIN server ON server.aid=virtualhost.server
@@ -192,6 +206,9 @@ WHERE server.hostname=:hostname');
                 'virtualhosts' => $virtualhosts
             ])
         );
+    }
+    private function handleRedirects(string $hostname, string $ip): void
+    {
         $stmt = $this->database->prepare('SELECT link.name,domain.domain,link.target,domain.admin
 FROM link
 INNER JOIN server ON link.server=server.aid
@@ -212,6 +229,9 @@ WHERE server.hostname=:hostname');
                 'virtualhosts' => $virtualhosts
             ])
         );
+    }
+    private function handleProxy(string $hostname, string $ip): void
+    {
         $stmt = $this->database->prepare('SELECT proxy.name,domain.domain,proxy.target,domain.admin
 FROM proxy
 INNER JOIN server ON proxy.server=server.aid
@@ -232,14 +252,47 @@ WHERE server.hostname=:hostname');
                 'virtualhosts' => $virtualhosts
             ])
         );
-        exec("a2ensite default");
-        exec("a2ensite http-only");
-        exec("a2ensite https-only");
-        exec("a2ensite http-redirect-only");
-        exec("a2ensite https-redirect-only");
-        exec("a2ensite http-proxy-only");
-        exec("a2ensite https-proxy-only");
+    }
+    private function stopApache2Http(): void
+    {
+        foreach (self::HTTP_SITES as $site) {
+            exec("a2dissite $site");
+        }
+        file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 80\n", '', file_get_contents('/etc/apache2/ports.conf')));
+        exec("service apache2 restart");
+        sleep(60);
+    }
+    private function startApache2(): void
+    {
+        foreach (self::REQUIRED_APACHE2_MODULES as $module) {
+            exec("a2enmod $module");
+        }
+        if ($this->enableSuggested) {
+            foreach (self::SUGGESTED_APACHE2_MODULES as $module) {
+                exec("a2enmod $module");
+            }
+        }
+        foreach (self::HTTP_SITES as $site) {
+            exec("a2ensite $site");
+        }
+        foreach (self::HTTPS_SITES as $site) {
+            exec("a2ensite $site");
+        }
         file_put_contents('/etc/apache2/ports.conf', str_replace("Listen 443\n", "Listen 80\nListen 443\n", file_get_contents('/etc/apache2/ports.conf')));
         exec("service apache2 restart");
+    }
+    public function create(): void
+    {
+        $hostname = gethostname();
+        $this->database->exec("DELETE FROM force_refresh WHERE server='$hostname'");
+        $this->stopApache2Http();
+        if (!$this->handleDefault($hostname)) {
+            return;
+        }
+        $ip = gethostbyname($hostname);
+        $this->handleVirtualHosts($hostname, $ip);
+        $this->handleRedirects($hostname, $ip);
+        $this->handleProxy($hostname, $ip);
+        $this->startApache2();
     }
 }

@@ -12,5 +12,6 @@ Dotenv::createImmutable(dirname(__DIR__))->load();
 (new VirtualHostGenerator(
     new PDO('mysql:dbname=' . $_ENV['DB_DATABASE'] . ';host=' . $_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD']),
     new Environment(new FilesystemLoader(dirname(__DIR__) . '/templates')),
-    (int) ($_ENV['ROTATE_LOG_DAYS'] ?? 7)
+    (int) ($_ENV['ROTATE_LOG_DAYS'] ?? 7),
+    $_ENV['enable_optional_modules']??'false' === 'true'
 ))->create();

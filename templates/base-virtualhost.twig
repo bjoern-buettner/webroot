@@ -3,6 +3,7 @@ ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 ErrorLog /var/log/{{ host.domain }}-error.log
 LogLevel warn
 CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
+
 <Directory />
     Options +FollowSymLinks
     AllowOverride None
@@ -18,6 +19,11 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
     Require all granted
 </Directory>
+
+<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|git|svn|yml|yaml|lock)$">
+    Require all denied
+</FilesMatch>
+
 <IfModule php_module>
     php_flag log_errors On
     php_flag display_errors Off
@@ -72,12 +78,11 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
 </IfModule>
-<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|git|svn|yml|yaml|lock)$">
-    Require all denied
-</FilesMatch>
-Header set X-Content-Type-Options "nosniff"
-Header set X-Frame-Options "SAMEORIGIN"
-Header set X-XSS-Protection "1; mode=block"
-Header set Referrer-Policy "strict-origin-when-cross-origin"
-Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-Header set Content-Security-Policy upgrade-insecure-requests
+<IfModule headers_module>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    Header set Content-Security-Policy upgrade-insecure-requests
+</IfModule>
