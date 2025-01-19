@@ -31,7 +31,7 @@ class VirtualHostGenerator
     private const array HTTPS_SITES = [
         'https-only',
         'https-redirect-only',
-        'a2ensite https-proxy-only',
+        'https-proxy-only',
     ];
 
     public function __construct(private PDO $database, private Environment $twig, private int $rotateLogDays, private bool $enableSuggested)
