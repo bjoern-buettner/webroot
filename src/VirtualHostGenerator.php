@@ -284,7 +284,11 @@ WHERE server.hostname=:hostname');
     public function create(): void
     {
         $hostname = gethostname();
-        $this->database->exec("DELETE FROM force_refresh WHERE server='$hostname'");
+        try {
+            $this->database->exec("DELETE FROM force_refresh WHERE server='$hostname'");
+        } catch (\PDOException $e) {
+            // nothing to do here
+        }
         $this->stopApache2Http();
         if (!$this->handleDefault($hostname)) {
             return;
