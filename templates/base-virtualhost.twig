@@ -72,7 +72,7 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
 </IfModule>
-<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|git|svn|yml|yaml|lock|json)$">
+<FilesMatch "\.(bak|config|dist|fla|inc|ini|log|psd|sh|sql|swp|git|svn|yml|yaml|lock)$">
     Require all denied
 </FilesMatch>
 Header set X-Content-Type-Options "nosniff"
