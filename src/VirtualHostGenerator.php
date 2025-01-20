@@ -108,11 +108,6 @@ class VirtualHostGenerator
                 mkdir('/var/' . $vhost . '/public');
             }
             shell_exec("useradd -c \"$vhost\" $user || true");
-            if ($items = glob('/var/' . $vhost . "/*")) {
-                foreach ($items as $item) {
-                    $this->chowngrp($item, $user);
-                }
-            }
             $this->chowngrp('/var/' . $vhost, $user);
             $today = date('Ymd');
             $tooOld = date('Ymd', strtotime("now -{$this->rotateLogDays}days"));
@@ -131,6 +126,11 @@ class VirtualHostGenerator
     }
     private function chowngrp(string $path, string $owner): void
     {
+        if (is_dir($path)) {
+            foreach(array_diff(scandir($path), ['.', '..']) as $file) {
+                $this->chowngrp($path . '/' . $file, $owner);
+            }
+        }
         chown($path, $owner);
         chgrp($path, $owner);
     }
