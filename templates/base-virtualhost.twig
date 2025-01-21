@@ -41,7 +41,7 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     AssignUserId "{{ host.user }}" "{{ host.user }}"
 </IfModule>
 <IfModule security2_module>
-    SecRuleEngine On
+    SecRuleEngine DetectionOnly
     SecRequestBodyAccess On
     SecResponseBodyAccess On
     SecResponseBodyMimeType text/plain text/html text/xml application/json
