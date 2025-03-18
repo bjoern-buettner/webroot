@@ -30,7 +30,7 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     php_flag session.cookie_httponly On
     php_flag session.cookie_secure On
     php_flag session.use_strict_mode On
-    php_value open_basedir {{ host.root }}
+    php_value open_basedir {{ host.root }}:/tmp
     php_value error_log /var/log/{{ host.domain }}-php.log
     php_value atatus.app_name "{{ host.domain }}"
 
