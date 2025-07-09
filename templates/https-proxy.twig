@@ -8,6 +8,16 @@ Header set Content-Security-Policy upgrade-insecure-requests
 ProxyPass / http://{{ host.target }}/
 ProxyPassReverse / http://{{ host.target }}/
 
+<IfModule mod_evasive20.c>
+    DOSHashTableSize 3097
+    DOSPageCount 10
+    DOSSiteCount 65
+    DOSPageInterval 1
+    DOSSiteInterval 2
+    DOSBlockingPeriod 75
+    DOSLogDir "/var/log/{{ host.domain }}-evasive.log"
+</IfModule>
+
 SSLEngine On
 SSLCertificateFile    /etc/letsencrypt/live/{{ domain }}/cert.pem
 SSLCertificateKeyFile /etc/letsencrypt/live/{{ domain }}/privkey.pem
