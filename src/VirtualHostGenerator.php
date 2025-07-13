@@ -185,7 +185,7 @@ class VirtualHostGenerator
     }
     private function handleVirtualHosts(string $hostname, string $ip): void
     {
-        $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.extra_webroot,domain.domain,domain.is_proxied,domain.admin,owner.atatus_api_key
+        $stmt = $this->database->prepare('SELECT virtualhost.aid,virtualhost.name,virtualhost.is_wordpress,virtualhost.extra_webroot,domain.domain,domain.is_proxied,domain.admin,owner.atatus_api_key
 FROM virtualhost
 INNER JOIN server ON server.aid=virtualhost.server
 INNER JOIN domain ON domain.aid=virtualhost.domain
