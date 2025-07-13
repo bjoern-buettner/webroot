@@ -56,6 +56,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS `virtualhost` (
 	`name` VARCHAR(255) NOT NULL COLLATE 'ascii_bin',
 	`domain` INT(10) UNSIGNED NOT NULL,
 	`server` INT(10) UNSIGNED NOT NULL,
+	`is_wordpress` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
 	PRIMARY KEY (`aid`) USING BTREE,
 	UNIQUE INDEX `name_domain` (`name`, `domain`) USING BTREE,
 	INDEX `domain` (`domain`) USING BTREE,
