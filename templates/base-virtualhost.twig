@@ -48,7 +48,7 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 
     {% if host.isWordpress %}
 
-        SecRule REQUEST_URI "@beginsWith /" setvar:tx.crs_exclusions_wordpress=1
+        IncludeOptional /var/www/mod_security/wordpress.conf
 
     {% endif %}
 
