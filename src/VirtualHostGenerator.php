@@ -100,6 +100,7 @@ class VirtualHostGenerator
                 'atatus_license_key' => $row['atatus_api_key'],
                 'user' => $user,
                 'hasCoreRuleset' => $hasCoreRuleset,
+                'isWordpress' => $row['is_wordpress'] == '1',
             ];
             if (!is_dir('/var/' . $vhost)) {
                 mkdir('/var/' . $vhost);
