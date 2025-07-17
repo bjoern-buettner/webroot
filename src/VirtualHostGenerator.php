@@ -59,7 +59,7 @@ class VirtualHostGenerator
     }
     private function buildHostList(PDOStatement $statement, array &$virtualhosts, string $ip): void
     {
-        $hasCoreRuleset = 1;// (int) is_dir('/opt/coreruleset'); // https://github.com/coreruleset/coreruleset
+        $hasCoreRuleset = (int) is_dir('/opt/coreruleset'); // https://github.com/coreruleset/coreruleset
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $vhost = trim($row['name'] . '.' . $row['domain'], '.');
             echo "Handling $vhost\n";
@@ -99,7 +99,7 @@ class VirtualHostGenerator
                 'aliases' => $aliases,
                 'atatus_license_key' => $row['atatus_api_key'],
                 'user' => $user,
-                'hasCoreRuleset' => $hasCoreRuleset,
+                'hasCoreRuleSet' => $hasCoreRuleset,
                 'isWordpress' => (int) ($row['is_wordpress'] == '1'),
                 'isNextcloud' => (int) ($row['is_nextcloud'] == '1'),
             ];
