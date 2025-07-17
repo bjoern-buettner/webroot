@@ -56,6 +56,12 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
 
         {% endif %}
 
+        {% if host.isNextcloud %}
+
+            IncludeOptional /var/www/mod_security/nextcloud.conf
+
+        {% endif %}
+
         IncludeOptional /opt/coreruleset/plugins/*-config.conf
         IncludeOptional /opt/coreruleset/plugins/*-before.conf
         IncludeOptional /opt/coreruleset/rules/*.conf
