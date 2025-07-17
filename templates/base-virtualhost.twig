@@ -46,13 +46,13 @@ CustomLog /var/log/{{ host.domain }}-access.log "%l %u %t \"%r\" %>s %b"
     SecResponseBodyAccess On
     SecResponseBodyMimeType text/plain text/html text/xml application/json
 
-    {% if host.hasCoreRuleSet %}
+    {% if host.hasCoreRuleSet == true %}
 
         IncludeOptional /opt/coreruleset/crs-setup.conf
 
-        {% if host.isWordpress %}IncludeOptional /var/www/mod_security/wordpress.conf{% endif %}
+        {% if host.isWordpress == true %}IncludeOptional /var/www/mod_security/wordpress.conf{% endif %}
 
-        {% if host.isNextcloud %}IncludeOptional /var/www/mod_security/nextcloud.conf{% endif %}
+        {% if host.isNextcloud == true %}IncludeOptional /var/www/mod_security/nextcloud.conf{% endif %}
 
         IncludeOptional /opt/coreruleset/plugins/*-config.conf
         IncludeOptional /opt/coreruleset/plugins/*-before.conf
