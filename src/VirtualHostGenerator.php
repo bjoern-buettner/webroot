@@ -59,7 +59,7 @@ class VirtualHostGenerator
     }
     private function buildHostList(PDOStatement $statement, array &$virtualhosts, string $ip): void
     {
-        $hasCoreRuleset = (int) is_dir('/opt/coreruleset'); // https://github.com/coreruleset/coreruleset
+        $hasCoreRuleset = 1;// (int) is_dir('/opt/coreruleset'); // https://github.com/coreruleset/coreruleset
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $vhost = trim($row['name'] . '.' . $row['domain'], '.');
             echo "Handling $vhost\n";
