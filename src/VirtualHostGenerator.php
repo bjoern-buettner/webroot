@@ -114,7 +114,7 @@ class VirtualHostGenerator
             $today = date('Ymd');
             $tooOld = date('Ymd', strtotime("now -{$this->rotateLogDays}days"));
             foreach (['access', 'error', 'php', 'evasive'] as $type) {
-                if (! is_file("/var/log/$vhost-$type.$today.log")) {
+                if (! is_file("/var/log/$vhost-$type.$today.log") && is_file("/var/log/$vhost-$type.log")) {
                     rename(
                         "/var/log/$vhost-$type.log",
                         "/var/log/$vhost-$type.$today.log"
