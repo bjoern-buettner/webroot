@@ -165,7 +165,7 @@ class VirtualHostGenerator
         $stmt = $this->database->prepare('SELECT * FROM server WHERE hostname=:hostname');
         $stmt->execute([':hostname' => $hostname]);
         $server = $stmt->fetch();
-        if (!$this->certificate($hostname, $server['admin'])) {
+        if (!$server || !$this->certificate($hostname, $server['admin'])) {
             return false;
         }
         file_put_contents(
